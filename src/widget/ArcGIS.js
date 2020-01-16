@@ -53,311 +53,151 @@
 	- Authentication
 		
 */
+
 var dojoConfig = {
 	async: false,
 	locale: "en",
 	paths: {
 		react: "https://cdnjs.cloudflare.com/ajax/libs/react/15.5.4/react.min",
-		"react-dom":
-			"https://cdnjs.cloudflare.com/ajax/libs/react/15.5.4/react-dom.min",
+		"react-dom": "https://cdnjs.cloudflare.com/ajax/libs/react/15.5.4/react-dom.min",
 		openlayers: "https://cdnjs.cloudflare.com/ajax/libs/ol3/4.1.0/ol",
-		dojox: "../../widgets/ArcGIS/lib/dojox",
-		esri: "../../widgets/ArcGIS/lib/esri",
-		moment: "../../widgets/ArcGIS/lib/moment"
+		dojox: "https://js.arcgis.com/3.31/dojox",
+		esri: "https://js.arcgis.com/3.31/esri",
+		moment: "https://js.arcgis.com/3.31/moment",
+		eDojo : "https://js.arcgis.com/3.31/dojo"
 	}
 };
 
 require(dojoConfig, [], function() {
 	return define("ArcGIS/widget/ArcGIS", [
-		// it is import to load the js files in the correct order. So, if js file A needs B, first load B then A, else Mendix will search for the file in it's own filesystem / mxclientsystem and will fail
+		/*~♦~♦ Dojo ♦~♦~*/
+		"eDojo/global",
 		"dojo/_base/declare",
-		"mxui/dom",
-		"dojo/dom",
-		"dojo/on",
-		"dojo/dom-class",
-		"dojo/parser",
-		"mxui/widget/_WidgetBase",
-		"dijit/_TemplatedMixin",
-		"dojo/dom-style",
-		"dojo/dom-construct",
 		"dojo/_base/array",
 		"dojo/_base/event",
 		"dojo/_base/lang",
-		"dojo/_base/unload",
-		"dojo/cookie",
-		"dojo/json",
-		"dijit/registry",
+
+		"dojo/on",
+		"dojo/dom-style",
+		"dojo/dom-construct",
+		"dojo/query",
+
 		"dojo/text!./template/ArcGIS.html",
-		// now all ArcGIS files
-		"ArcGIS/lib/dojox/gfx/Mover",
-		"ArcGIS/lib/dojox/gfx/Moveable",
-		"ArcGIS/lib/dojox/gfx/_base",
-		"ArcGIS/lib/dojox/gfx/matrix",
-		"ArcGIS/lib/dojox/gfx/renderer",
-		"ArcGIS/lib/dojox/gfx/svg",
-		"ArcGIS/lib/dojox/gfx/filters",
-		"ArcGIS/lib/dojox/gfx/svgext",
-		"ArcGIS/lib/dojox/gfx",
-		"ArcGIS/lib/dojox/collections/_base",
-		"ArcGIS/lib/dojox/collections/ArrayList",
-		"ArcGIS/lib/dojox/grid/util",
-		"dojox/main",
-		"ArcGIS/lib/dojox/grid/cells/_base",
-		"ArcGIS/lib/dojox/grid/cells",
-		"ArcGIS/lib/dojox/grid/_Events",
-		"ArcGIS/lib/dojox/grid/_Scroller",
-		"ArcGIS/lib/dojox/html/metrics",
-		"ArcGIS/lib/dojox/grid/_Builder",
-		"ArcGIS/lib/dojox/grid/_View",
-		"ArcGIS/lib/dojox/grid/Selection",
-		"ArcGIS/lib/dojox/grid/_SelectionPreserver",
-		"ArcGIS/lib/dojox/grid/DataSelection",
-		"ArcGIS/lib/dojox/grid/_RowSelector",
-		"ArcGIS/lib/dojox/grid/_Layout",
-		"ArcGIS/lib/dojox/grid/_ViewManager",
-		"ArcGIS/lib/dojox/grid/_RowManager",
-		"ArcGIS/lib/dojox/grid/_FocusManager",
-		"ArcGIS/lib/dojox/grid/_EditManager",
-		"ArcGIS/lib/dojox/grid/_Grid",
-		"ArcGIS/lib/dojox/grid/DataGrid",
-		"ArcGIS/lib/dojox/html/entities",
-		"ArcGIS/lib/esri/nls/jsapi",
-		"ArcGIS/lib/esri/kernel",
-		"ArcGIS/lib/esri/lang",
-		"ArcGIS/lib/esri/deferredUtils",
-		"ArcGIS/lib/esri/config",
-		"ArcGIS/lib/esri/SpatialReference",
-		"ArcGIS/lib/esri/ImageSpatialReference",
-		"ArcGIS/lib/esri/geometry/Geometry",
-		"ArcGIS/lib/esri/sniff",
-		"ArcGIS/lib/esri/srUtils",
-		"ArcGIS/lib/esri/WKIDUnitConversion",
-		"ArcGIS/lib/esri/geometry/scaleUtils",
-		"ArcGIS/lib/esri/geometry/Point",
-		"ArcGIS/lib/esri/geometry/ScreenPoint",
-		"ArcGIS/lib/esri/geometry/webMercatorUtils",
-		"ArcGIS/lib/esri/geometry/mathUtils",
-		"ArcGIS/lib/esri/geometry/Extent",
-		"ArcGIS/lib/esri/geometry/Polyline",
-		"ArcGIS/lib/esri/geometry/Polygon",
-		"ArcGIS/lib/esri/geometry/Multipoint",
-		"ArcGIS/lib/esri/geometry/screenUtils",
-		"ArcGIS/lib/esri/geometry/geodesicUtils",
-		"ArcGIS/lib/esri/geometry/jsonUtils",
-		"ArcGIS/lib/esri/geometry/normalizeUtils",
-		"ArcGIS/lib/esri/geometry/Rect",
-		"ArcGIS/lib/esri/units",
-		"ArcGIS/lib/esri/geometry",
-		"ArcGIS/lib/esri/basemaps",
-		"ArcGIS/lib/esri/Evented",
-		"ArcGIS/lib/esri/fx",
-		"ArcGIS/lib/esri/tileUtils",
-		"ArcGIS/lib/esri/urlUtils",
-		"ArcGIS/lib/esri/PluginTarget",
-		"ArcGIS/lib/esri/Color",
-		"ArcGIS/lib/esri/arcade/ImmutableArray",
-		"ArcGIS/lib/esri/core/tsSupport/extendsHelper",
-		"ArcGIS/lib/esri/arcade/ImmutablePointArray",
-		"ArcGIS/lib/esri/arcade/ImmutablePathArray",
-		"ArcGIS/lib/moment/moment",
-		"ArcGIS/lib/esri/plugins/moment",
-		"ArcGIS/lib/esri/moment",
-		"ArcGIS/lib/esri/arcade/FunctionWrapper",
-		"ArcGIS/lib/esri/arcade/languageUtils",
-		"ArcGIS/lib/esri/arcade/Dictionary",
-		"ArcGIS/lib/esri/layers/gfxSniff",
-		"ArcGIS/lib/esri/request",
-		"ArcGIS/lib/esri/layers/layer",
-		"ArcGIS/lib/esri/domUtils",
-		"ArcGIS/lib/esri/symbols/Symbol",
-		"ArcGIS/lib/esri/symbols/MarkerSymbol",
-		"ArcGIS/lib/esri/symbols/LineSymbol",
-		"ArcGIS/lib/esri/symbols/SimpleLineSymbol",
-		"ArcGIS/lib/esri/symbols/SimpleMarkerSymbol",
-		"ArcGIS/lib/esri/layers/GraphicsLayer",
-		"ArcGIS/lib/esri/layers/LOD",
-		"ArcGIS/lib/esri/layers/TileInfo",
-		"ArcGIS/lib/esri/layers/TimeReference",
-		"ArcGIS/lib/esri/TimeExtent",
-		"ArcGIS/lib/esri/layers/LayerTimeOptions",
-		"ArcGIS/lib/esri/layers/TimeInfo",
-		"ArcGIS/lib/esri/layers/LayerInfo",
-		"ArcGIS/lib/esri/layerUtils",
-		"ArcGIS/lib/esri/layers/ArcGISMapServiceLayer",
-		"ArcGIS/lib/esri/layers/ImageParameters",
-		"ArcGIS/lib/esri/layers/MapImage",
-		"ArcGIS/lib/esri/layers/DynamicMapServiceLayer",
-		"ArcGIS/lib/esri/layers/LayerSource",
-		"ArcGIS/lib/esri/layers/DataSource",
-		"ArcGIS/lib/esri/layers/QueryDataSource",
-		"ArcGIS/lib/esri/layers/LayerMapSource",
-		"ArcGIS/lib/esri/layers/TableDataSource",
-		"ArcGIS/lib/esri/layers/RasterDataSource",
-		"ArcGIS/lib/esri/layers/JoinDataSource",
-		"ArcGIS/lib/esri/layers/LayerDataSource",
-		"ArcGIS/lib/esri/layers/DynamicLayerInfo",
-		"ArcGIS/lib/esri/layers/ArcGISDynamicMapServiceLayer",
-		"ArcGIS/lib/esri/layers/TiledMapServiceLayer",
-		"ArcGIS/lib/esri/layers/TileMap",
-		"ArcGIS/lib/esri/layers/ArcGISTiledMapServiceLayer",
-		"ArcGIS/lib/esri/layers/MapImageLayer",
-		"ArcGIS/lib/esri/layers/OpenStreetMapLayer",
-		"ArcGIS/lib/esri/ServerInfo",
-		"ArcGIS/lib/esri/OAuthCredential",
-		"ArcGIS/lib/esri/arcgis/OAuthInfo",
-		"ArcGIS/lib/esri/IdentityManagerBase",
-		"ArcGIS/lib/esri/Credential",
-		"ArcGIS/lib/esri/IdentityManagerDialog",
-		"ArcGIS/lib/esri/OAuthSignInHandler",
-		"ArcGIS/lib/esri/IdentityManager",
-		"ArcGIS/lib/esri/layers/VectorTileLayerImpl",
-		"ArcGIS/lib/esri/layers/VectorTileLayerWrapper",
-		//'ArcGIS/lib/esri/layers/VectorTileLayer',
-		"ArcGIS/lib/esri/Credential",
-		"ArcGIS/lib/esri/InfoTemplate",
-		"ArcGIS/lib/esri/InfoWindowBase",
-		"ArcGIS/lib/esri/symbols/PictureMarkerSymbol",
-		"ArcGIS/lib/esri/symbols/CartographicLineSymbol",
-		"ArcGIS/lib/esri/symbols/FillSymbol",
-		"ArcGIS/lib/esri/symbols/PictureFillSymbol",
-		"ArcGIS/lib/esri/symbols/SimpleFillSymbol",
-		"ArcGIS/lib/esri/symbols/Font",
-		"ArcGIS/lib/esri/symbols/TextSymbol",
-		"ArcGIS/lib/esri/symbols/jsonUtils",
-		"ArcGIS/lib/esri/graphic",
-		"ArcGIS/lib/esri/tasks/SpatialRelationship",
-		"ArcGIS/lib/esri/tasks/query",
-		"ArcGIS/lib/esri/PopupBase",
-		"ArcGIS/lib/esri/dijit/Popup",
-		"ArcGIS/lib/esri/tasks/Task",
-		"ArcGIS/lib/esri/graphicsUtils",
-		"ArcGIS/lib/esri/tasks/FeatureSet",
-		"ArcGIS/lib/esri/tasks/QueryTask",
-		"ArcGIS/lib/esri/tasks/RelationshipQuery",
-		"ArcGIS/lib/esri/tasks/StatisticDefinition",
-		"ArcGIS/lib/esri/dijit/_EventedWidget",
-		"ArcGIS/lib/esri/dijit/PopupRenderer",
-		"ArcGIS/lib/esri/PopupInfo",
-		"ArcGIS/lib/esri/dijit/PopupTemplate",
-		"ArcGIS/lib/esri/PopupManager",
-		"ArcGIS/lib/esri/plugins/popupManager",
-		"ArcGIS/lib/esri/_coremap",
-		"ArcGIS/lib/esri/MouseEvents",
-		"ArcGIS/lib/esri/TouchEvents",
-		"ArcGIS/lib/esri/PointerEvents",
-		"ArcGIS/lib/esri/MapNavigationManager",
-		"ArcGIS/lib/esri/map",
-		"ArcGIS/lib/esri/dijit/Attribution",
-		"ArcGIS/lib/esri/OperationBase",
-		"ArcGIS/lib/esri/undoManager",
-		"ArcGIS/lib/esri/toolbars/_toolbar",
-		"ArcGIS/lib/esri/toolbars/navigation",
-		"ArcGIS/lib/esri/toolbars/_Box",
-		"ArcGIS/lib/esri/toolbars/_GraphicMover",
-		"ArcGIS/lib/esri/toolbars/_VertexMover",
-		"ArcGIS/lib/esri/toolbars/_VertexEditor",
-		"ArcGIS/lib/esri/toolbars/TextEditor",
-		"ArcGIS/lib/esri/toolbars/edit",
-		"ArcGIS/lib/esri/toolbars/draw",
-		"ArcGIS/lib/esri/arcade/Feature",
-		"ArcGIS/lib/esri/arcade/functions/string",
-		"ArcGIS/lib/esri/arcade/functions/date",
-		"ArcGIS/lib/esri/arcade/functions/maths",
-		"ArcGIS/lib/esri/arcade/functions/fieldStats",
-		"ArcGIS/lib/esri/arcade/functions/stats",
-		"ArcGIS/lib/esri/arcade/functions/geometry",
-		"ArcGIS/lib/esri/arcade/treeAnalysis",
-		"ArcGIS/lib/esri/arcade/arcadeCompiler",
-		"ArcGIS/lib/esri/arcade/lib/esprima",
-		"ArcGIS/lib/esri/arcade/parser",
-		"ArcGIS/lib/esri/arcade/arcadeRuntime",
-		"ArcGIS/lib/esri/arcade/arcade",
-		"ArcGIS/lib/esri/renderers/arcadeUtils",
-		"ArcGIS/lib/esri/renderers/Renderer",
-		"ArcGIS/lib/esri/renderers/SimpleRenderer",
-		"ArcGIS/lib/esri/renderers/UniqueValueRenderer",
-		"ArcGIS/lib/esri/renderers/ClassBreaksRenderer",
-		"ArcGIS/lib/esri/renderers/ScaleDependentRenderer",
-		"ArcGIS/lib/esri/renderers/DotDensityRenderer",
-		"ArcGIS/lib/esri/renderers/HeatmapRenderer",
-		"ArcGIS/lib/esri/renderers/TemporalRenderer",
-		"ArcGIS/lib/esri/renderers/VectorFieldRenderer",
-		"ArcGIS/lib/esri/renderers/SymbolAger",
-		"ArcGIS/lib/esri/renderers/TimeClassBreaksAger",
-		"ArcGIS/lib/esri/renderers/TimeRampAger",
-		"ArcGIS/lib/esri/renderers/jsonUtils",
-		"ArcGIS/lib/esri/dijit/_EventedWidget",
-		"ArcGIS/lib/esri/dijit/Legend",
-		"ArcGIS/lib/esri/tasks/Task",
-		"ArcGIS/lib/esri/tasks/GeometryService",
-		"ArcGIS/lib/esri/tasks/IdentifyResult",
-		"ArcGIS/lib/esri/tasks/IdentifyParameters",
-		"ArcGIS/lib/esri/tasks/IdentifyTask",
-		"ArcGIS/lib/esri/layers/Domain",
-		"ArcGIS/lib/esri/layers/CodedValueDomain",
-		"ArcGIS/lib/esri/layers/RangeDomain",
-		"ArcGIS/lib/esri/layers/Field",
-		"ArcGIS/lib/esri/layers/InheritedDomain",
-		"ArcGIS/lib/esri/layers/FeatureTemplate",
-		"ArcGIS/lib/esri/layers/FeatureType",
-		"ArcGIS/lib/esri/layers/FeatureEditResult",
-		"ArcGIS/lib/esri/symbols/ShieldLabelSymbol",
-		"ArcGIS/lib/esri/layers/LabelClass",
-		"ArcGIS/lib/esri/layers/RenderMode",
-		"ArcGIS/lib/esri/layers/GridLayout",
-		"ArcGIS/lib/esri/layers/OnDemandMode",
-		"ArcGIS/lib/esri/layers/SnapshotMode",
-		"ArcGIS/lib/esri/layers/StreamMode",
-		"ArcGIS/lib/esri/layers/SelectionMode",
-		"ArcGIS/lib/esri/layers/TrackManager",
-		"ArcGIS/lib/esri/layers/HeatmapManager",
-		"ArcGIS/lib/esri/layers/FeatureLayer",
-		"ArcGIS/lib/esri/dijit/editing/TemplatePickerItem",
-		"ArcGIS/lib/esri/dijit/editing/TemplatePicker",
-		"ArcGIS/lib/esri/dijit/BasemapToggle",
-		"ArcGIS/lib/esri/dijit/BasemapLayer",
-		"ArcGIS/lib/esri/styles/basic",
-		"ArcGIS/lib/esri/tasks/AddressCandidate",
-		"ArcGIS/lib/esri/tasks/locator",
-		"ArcGIS/lib/esri/promiseList",
-		"dojo/text!../lib/esri/dijit/Search/templates/Search.html",
-		"ArcGIS/lib/esri/dijit/Search",
-		// below libraries are needed, since the dojo parsing from a template is broken as from Mendix 6.10
+
+		/*~♦~♦ DojoX ♦~♦~*/
+
+		"dojox/gfx/Moveable",
+
+		/*~♦~♦ Dijit ♦~♦~*/
+		"dijit/_TemplatedMixin",
 		"dijit/layout/BorderContainer",
 		"dijit/layout/ContentPane",
-		"dijit/Toolbar",
 		"dijit/form/Button",
-		"dijit/layout/AccordionContainer"
+		"dijit/layout/AccordionContainer",
+
+		/*~♦~♦ Mendix ♦~♦~*/
+		"mxui/widget/_WidgetBase",
+		"mxui/dom",
+
+		/*~♦~♦ Esri ♦~♦~*/
+		"esri/Color",
+		"esri/InfoTemplate",
+		"esri/map",
+		"esri/basemaps",
+		"esri/SpatialReference",
+		"esri/graphic",
+
+		"esri/tasks/GeometryService",
+		"esri/tasks/QueryTask",
+		"esri/tasks/query",
+
+		"esri/toolbars/edit",
+
+		"esri/dijit/Popup",
+		"esri/dijit/PopupTemplate",
+		"esri/dijit/BasemapToggle",
+		"esri/dijit/Search",
+
+		"esri/symbols/SimpleFillSymbol",
+		"esri/symbols/SimpleLineSymbol",
+		"esri/symbols/SimpleMarkerSymbol",
+
+		"esri/geometry/Point",
+		"esri/geometry/Multipoint",
+		"esri/geometry/Polyline",
+
+		"esri/layers/ImageParameters",
+		"esri/layers/ArcGISDynamicMapServiceLayer",
+		"esri/layers/FeatureLayer",
+		"esri/layers/GraphicsLayer",
+
+		"esri/renderers/UniqueValueRenderer",
+
+		"esri/dijit/Legend",
+
+		/*-+-+-+ Pure import dependencies +-+-+-*/
+		"dojox/gfx/Mover",
+		"dojox/gfx/_base",
+		"dojox/gfx/matrix",
+		"moment/moment"
 	], function(
+		global,
 		declare,
-		dom,
-		dojoDom,
-		on,
-		domClass,
-		parser,
-		_WidgetBase,
-		_TemplatedMixin,
-		domStyle,
-		domConstruct,
 		arrayUtils,
 		event,
 		lang,
-		baseUnload,
-		cookie,
-		JSON,
-		registry,
-		widgetTemplate
+		on,
+		domStyle,
+		domConstruct,
+		domQuery,
+		widgetHTMLTemplate,
+
+		Moveable,
+
+		_TemplatedMixin,
+		BorderContainer,
+		ContentPane,
+		Button,
+		AccordionContainer,
+
+		_MxWidgetBase,
+		mxDom,
+
+		Color,
+		InfoTemplate,
+		Map,
+		basemaps,
+		SpatialReference,
+		Graphic,
+		GeometryService,
+		QueryTask,
+		Query,
+		Edit,
+		Popup,
+		PopupTemplate,
+		BasemapToggle,
+		Search,
+		SimpleFillSymbol,
+		SimpleLineSymbol,
+		SimpleMarkerSymbol,
+		Point,
+		Multipoint,
+		Polyline,
+		ImageParameters,
+		ArcGISDynamicMapServiceLayer,
+		FeatureLayer,
+		GraphicsLayer,
+		UniqueValueRenderer,
+		Legend
 	) {
 		"use strict";
 
-		return declare("ArcGIS.widget.ArcGIS", [_WidgetBase, _TemplatedMixin], {
-			// load the HTML template into the widget. Since Mx 6.10 deprecated, use dojo/text! instead
-			templateString: widgetTemplate,
+		return declare("ArcGIS.widget.ArcGIS", [_MxWidgetBase, _TemplatedMixin], {
+			templateString: widgetHTMLTemplate,
 			_progressID: null,
 			_handle: null,
 			_contextObj: null,
 			_gisMap: null,
-			_defaultPosition: null,
 			_logNode: "ArcGIS Widget: ",
 			visibleLayerIds: [],
 			legendLayers: [],
@@ -401,7 +241,7 @@ require(dojoConfig, [], function() {
 				this._initialLoad = true;
 
 				//setup geometryService
-				this.geometryService = new esri.tasks.GeometryService(
+				this.geometryService = new GeometryService(
 					"https://utility.arcgisonline.com/ArcGIS/rest/services/Geometry/GeometryServer"
 				);
 
@@ -422,9 +262,6 @@ require(dojoConfig, [], function() {
 				this._resetSubscriptions();
 
 				// Widget configured variables
-				this.objectid = this._contextObj
-					? this._contextObj.get(this.objectIDAttr)
-					: null;
 				this.centerCoordinates = this._contextObj
 					? this._contextObj.get(this.centerAttr)
 					: null;
@@ -440,14 +277,10 @@ require(dojoConfig, [], function() {
 					} else {
 						this.zoomlevel = this.defaultZoom;
 					}
-				} // if map  already available, zoom to object if available. use coordinates if existing, else query ArcGIS to get coordinates
-				else if (this.objectid) {
+				} else {
 					this._referenceMxObjectsArr = [obj];
 					this._refreshMap();
-				} else {
-					// if no object exists, zoom out to Default Zoom Level and Default X, Y
-					this.zoomRow();
-				}
+				} 
 				callback();
 			},
 			resize: function(box) {
@@ -491,16 +324,16 @@ require(dojoConfig, [], function() {
 					: undefined;
 
 				//This specifies the symbols highlighting selected/queried objects
-				var popup = new esri.dijit.Popup(
+				var popup = new Popup(
 					{
-						fillSymbol: new esri.symbol.SimpleFillSymbol(
-							esri.symbol.SimpleFillSymbol.STYLE_SOLID,
-							new esri.symbol.SimpleLineSymbol(
-								esri.symbol.SimpleLineSymbol.STYLE_SOLID,
-								new esri.Color([255, 0, 0]),
+						fillSymbol: new SimpleFillSymbol(
+							SimpleFillSymbol.STYLE_SOLID,
+							new SimpleLineSymbol(
+								SimpleLineSymbol.STYLE_SOLID,
+								new Color([255, 0, 0]),
 								2
 							),
-							new esri.Color([255, 255, 0, 0.25])
+							new Color([255, 255, 0, 0.25])
 						)
 					},
 					dojo.create("div")
@@ -532,19 +365,19 @@ require(dojoConfig, [], function() {
 
 				// use popup for ArcGISDynamicMapServiceLayer
 				// populate popup template with Query Task attributes array
-				this.popupTemplate = new esri.dijit.PopupTemplate({
+				this.popupTemplate = new PopupTemplate({
 					title: "{" + this._infoWindowTitle + "}",
 					fieldInfos: this.fieldInfosArr
 				});
 
 				// only applicable for MapService
-				this.multipleRecordsTemplate = new esri.dijit.PopupTemplate({
+				this.multipleRecordsTemplate = new PopupTemplate({
 					title:
 						"Multiple objects found where clicked. <br><br> Please zoom in further to single object."
 				});
 
 				// use infotemplate for FeatureLayers
-				this.infotemplate = new esri.InfoTemplate();
+				this.infotemplate = new InfoTemplate();
 
 				this.infotemplate.setContent(
 					lang.hitch(this, function(graphic) {
@@ -570,14 +403,19 @@ require(dojoConfig, [], function() {
 								"cursor : pointer; margin-right: 6px; color: black";
 
 							// create a span holding the alt glyphicon
-							var btnSpan = dom.create("span");
+							var btnSpan = mxDom.create("span");
 							btnSpan.setAttribute("class", "glyphicon glyphicon-share-alt");
 
 							// create the custom text
-							var btnText = dom.create("text");
+							var btnText = mxDom.create("text");
 
 							// create microflow button
-							this._mfBtn = dom.create("button", btnOptions, btnSpan, btnText);
+							this._mfBtn = mxDom.create(
+								"button",
+								btnOptions,
+								btnSpan,
+								btnText
+							);
 
 							btnText.textContent = this.onClickButttonLabel;
 							btnText.style.marginLeft = "4px";
@@ -618,26 +456,26 @@ require(dojoConfig, [], function() {
 
 				if (this.baseMapURL_Default) {
 					// change basemap URL if set from Modeler
-					esri.basemaps.topo.baseMapLayers = [{ url: this.baseMapURL_Default }];
-					esri.basemaps.satellite.baseMapLayers = [
+					basemaps.topo.baseMapLayers = [{ url: this.baseMapURL_Default }];
+					basemaps.satellite.baseMapLayers = [
 						{ url: this.baseMapURL_Satellite }
 					];
 				} else {
 					// load default baseMap
-					esri.basemaps.topo.baseMapLayers = [
+					basemaps.topo.baseMapLayers = [
 						{
 							url:
 								"https://services.arcgisonline.com/arcgis/rest/services/World_Topo_Map/MapServer"
 						}
 					];
-					esri.basemaps.satellite.baseMapLayers = [
+					basemaps.satellite.baseMapLayers = [
 						{
 							url:
 								"https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer"
 						}
 					];
 				}
-				this._gisMap = new esri.Map(this.mapContainer, {
+				this._gisMap = new Map(this.mapContainer, {
 					basemap: "topo",
 					zoom: Number(this.zoomlevel),
 					sliderStyle: "small",
@@ -674,12 +512,12 @@ require(dojoConfig, [], function() {
 						// attach events to gismap and layer loading
 						this._setupEvents();
 
-						this._initNewDeclaration();
+						if( this.enableNewReportCreation ) { this._initNewDeclaration(); }
 						this._getDeclarationsData();
 					}.bind(this)
 				);
 
-				if (gpsLocation && gpsLocation!== -1 && this.centerOnLocation) {
+				if (gpsLocation && gpsLocation !== -1 && this.centerOnLocation) {
 					this._zoomToLocation(
 						Number(gpsLocation.longitude),
 						Number(gpsLocation.latitude),
@@ -694,7 +532,7 @@ require(dojoConfig, [], function() {
 					);
 				}
 
-				var toggle = new esri.dijit.BasemapToggle(
+				var toggle = new BasemapToggle(
 					{
 						map: this._gisMap,
 						basemap: "satellite",
@@ -702,12 +540,12 @@ require(dojoConfig, [], function() {
 							topo: {
 								title: "Normaal",
 								thumbnailUrl:
-									"widgets/ArcGIS/lib/esri/images/basemap/streets.jpg"
+									"https://js.arcgis.com/3.31/esri/images/basemap/streets.jpg"
 							},
 							satellite: {
 								title: "Sateliet",
 								thumbnailUrl:
-									"widgets/ArcGIS/lib/esri/images/basemap/satellite.jpg"
+									"https://js.arcgis.com/3.31/esri/images/basemap/satellite.jpg"
 							}
 						}
 					},
@@ -717,7 +555,7 @@ require(dojoConfig, [], function() {
 				toggle.startup();
 
 				if (this.enableSearch) {
-					var search = new esri.dijit.Search(
+					var search = new Search(
 						{
 							map: this._gisMap,
 							showInfoWindowOnSelect: true,
@@ -731,12 +569,11 @@ require(dojoConfig, [], function() {
 				//Use the ImageParameters to set the visibleLayerIds layers in the map service during ArcGISDynamicMapServiceLayer construction.
 				var imageParameters = {};
 
-				imageParameters = new esri.layers.ImageParameters();
+				imageParameters = new ImageParameters();
 
 				imageParameters.layerIds = [2];
 
-				imageParameters.layerOption =
-					esri.layers.ImageParameters.LAYER_OPTION_SHOW;
+				imageParameters.layerOption = ImageParameters.LAYER_OPTION_SHOW;
 				//can also be: LAYER_OPTION_EXCLUDE, LAYER_OPTION_HIDE, LAYER_OPTION_INCLUDE
 
 				var arcGisLayer,
@@ -802,7 +639,7 @@ require(dojoConfig, [], function() {
 
 								layerOpts.imageParameters = imageParameters;
 
-								arcGisLayer = new esri.layers.ArcGISDynamicMapServiceLayer(
+								arcGisLayer = new ArcGISDynamicMapServiceLayer(
 									layerSpecificURL + "/MapServer",
 									layerOpts
 								);
@@ -822,13 +659,13 @@ require(dojoConfig, [], function() {
 								}
 							} else if (layerObj.serverType === "FeatureServer") {
 								// set FeatuteLayer specific options
-								layerOpts.mode = esri.layers.FeatureLayer.MODE_SNAPSHOT;
+								layerOpts.mode = FeatureLayer.MODE_SNAPSHOT;
 								layerOpts.outFields = this.queryOutFieldsArr;
 								layerOpts.infoTemplate = this.infotemplate;
 
 								// if token available append to url, else could give token required errors in browser
 								if (this._token) {
-									arcGisLayer = new esri.layers.FeatureLayer(
+									arcGisLayer = new FeatureLayer(
 										layerSpecificURL +
 											"/FeatureServer/" +
 											layerObj.featureLayerID +
@@ -837,7 +674,7 @@ require(dojoConfig, [], function() {
 										layerOpts
 									);
 								} else {
-									arcGisLayer = new esri.layers.FeatureLayer(
+									arcGisLayer = new FeatureLayer(
 										layerSpecificURL +
 											"/FeatureServer/" +
 											layerObj.featureLayerID,
@@ -894,25 +731,29 @@ require(dojoConfig, [], function() {
 					 && latitude  !== 0
 				){
 					if (project) {
-						const locationPt = new esri.geometry.Point(longitude, latitude);
+						const locationPt = new Point(longitude, latitude);
 						this.geometryService.project(
 							[locationPt],
-							new esri.SpatialReference({
+							new SpatialReference({
 								wkid: Number(this.spatialReference)
 							}),
 							function(projectedPoints) {
 								if (!this.declarationsExtent){/* check again, because this is async */
-									this._gisMap.centerAndZoom(projectedPoints[0], zoom);
+									this._gisMap.centerAt(projectedPoints[0]);
+									this._gisMap.setZoom(zoom);
+									//this._gisMap.centerAndZoom(projectedPoints[0], zoom);
 								}
 							}.bind(this)
 						);
 					} else {
-						const locationPt = new esri.geometry.Point(
+						const locationPt = new Point(
 							longitude,
 							latitude,
-							new esri.SpatialReference({ wkid: Number(this.spatialReference) })
+							new SpatialReference({ wkid: Number(this.spatialReference) })
 						);
-						this._gisMap.centerAndZoom(locationPt, zoom);
+						this._gisMap.centerAt(locationPt);
+						this._gisMap.setZoom(zoom);
+						//this._gisMap.centerAndZoom(locationPt, zoom);
 					}
 				}
 			},
@@ -953,15 +794,15 @@ require(dojoConfig, [], function() {
 			_createSimpleMarkerSymbol: function() {
 				switch (this.markerSymbol) {
 					case "STYLE_CIRCLE":
-						return esri.symbol.SimpleMarkerSymbol.STYLE_CIRCLE;
+						return SimpleMarkerSymbol.STYLE_CIRCLE;
 					case "STYLE_CROSS":
-						return esri.symbol.SimpleMarkerSymbol.STYLE_CROSS;
+						return SimpleMarkerSymbol.STYLE_CROSS;
 					case "STYLE_DIAMOND":
-						return esri.symbol.SimpleMarkerSymbol.STYLE_DIAMOND;
+						return SimpleMarkerSymbol.STYLE_DIAMOND;
 					case "STYLE_SQUARE":
-						return esri.symbol.SimpleMarkerSymbol.STYLE_SQUARE;
+						return SimpleMarkerSymbol.STYLE_SQUARE;
 					case "STYLE_X":
-						return esri.symbol.SimpleMarkerSymbol.STYLE_X;
+						return SimpleMarkerSymbol.STYLE_X;
 				}
 			},
 			_updateRenderer: function(layer, geometryType) {
@@ -983,25 +824,25 @@ require(dojoConfig, [], function() {
 				}
 				if (geometryType == "point") {
 					// new symbol based on color of object
-					defaultSymbol = new esri.symbol.SimpleMarkerSymbol(
+					defaultSymbol = new SimpleMarkerSymbol(
 						this._simpleMarkerSymbol,
 						10,
-						new esri.symbol.SimpleLineSymbol(
-							esri.symbol.SimpleLineSymbol.STYLE_SOLID,
-							new esri.Color(defaultColorBorderColor),
+						new SimpleLineSymbol(
+							SimpleLineSymbol.STYLE_SOLID,
+							new Color(defaultColorBorderColor),
 							4
 						), // border color
-						new esri.Color(defaultColorFillColor) // fill color
+						new Color(defaultColorFillColor) // fill color
 					);
 				} else {
-					defaultSymbol = new esri.symbol.SimpleFillSymbol(
-						esri.symbol.SimpleFillSymbol.STYLE_SOLID,
-						new esri.symbol.SimpleLineSymbol(
-							esri.symbol.SimpleLineSymbol.STYLE_SOLID,
-							new esri.Color(defaultColorBorderColor),
+					defaultSymbol = new SimpleFillSymbol(
+						SimpleFillSymbol.STYLE_SOLID,
+						new SimpleLineSymbol(
+							SimpleLineSymbol.STYLE_SOLID,
+							new Color(defaultColorBorderColor),
 							1
 						),
-						new esri.Color(defaultColorFillColor)
+						new Color(defaultColorFillColor)
 					);
 				}
 				var layerSymbol;
@@ -1023,7 +864,7 @@ require(dojoConfig, [], function() {
 
 				// at intial load original renderer not yet stored -> store!
 				if (!this._originalRenderer) {
-					this._originalRenderer = new esri.renderer.UniqueValueRenderer(
+					this._originalRenderer = new UniqueValueRenderer(
 						layerSymbol,
 						this.arcGISID
 					);
@@ -1048,26 +889,26 @@ require(dojoConfig, [], function() {
 
 					if (geometryType == "point") {
 						// new marker symbol based on color of object
-						newSymbol = new esri.symbol.SimpleMarkerSymbol(
+						newSymbol = new SimpleMarkerSymbol(
 							this._simpleMarkerSymbol,
 							10,
-							new esri.symbol.SimpleLineSymbol(
-								esri.symbol.SimpleLineSymbol.STYLE_SOLID,
-								new esri.Color(featureColorBorderColor),
+							new SimpleLineSymbol(
+								SimpleLineSymbol.STYLE_SOLID,
+								new Color(featureColorBorderColor),
 								2
 							), // border color
-							new esri.Color(featureColorFillColor) // fill color
+							new Color(featureColorFillColor) // fill color
 						);
 					} else {
 						// new non marker symbol (leave as is - no overrule)
-						newSymbol = new esri.symbol.SimpleFillSymbol(
-							esri.symbol.SimpleFillSymbol.STYLE_SOLID,
-							new esri.symbol.SimpleLineSymbol(
-								esri.symbol.SimpleLineSymbol.STYLE_SOLID,
-								new esri.Color(featureColorBorderColor),
+						newSymbol = new SimpleFillSymbol(
+							SimpleFillSymbol.STYLE_SOLID,
+							new SimpleLineSymbol(
+								SimpleLineSymbol.STYLE_SOLID,
+								new Color(featureColorBorderColor),
 								1
 							),
-							new esri.Color(featureColorFillColor)
+							new Color(featureColorFillColor)
 						);
 					}
 
@@ -1176,7 +1017,7 @@ require(dojoConfig, [], function() {
 					});
 				}
 			},
-			_getCustomZoomLevelMF: function(){
+			_getCustomZoomLevelMF: function() {
 				mx.data.action({
 					params: {
 						applyto: "none",
@@ -1187,7 +1028,7 @@ require(dojoConfig, [], function() {
 						this.zoomlevel = intResult;
 					}),
 					error: lang.hitch(this, function(error) {
-						console.error(this._logNode + error.description);	
+						console.error(this._logNode + error.description);
 						this.zoomlevel = this.defaultZoom;
 					})
 				});
@@ -1213,7 +1054,7 @@ require(dojoConfig, [], function() {
 						"/MapServer/" +
 						layerObj.visibleLayerIds;
 				}
-				var qt = new esri.tasks.QueryTask(identifyTaskLayerURL);
+				var qt = new QueryTask(identifyTaskLayerURL);
 
 				qt.execute(
 					query,
@@ -1258,9 +1099,9 @@ require(dojoConfig, [], function() {
 				//return centerLocation;
 			},
 			_getExtentFromQueryDef: function(layerObj, queryDef) {
-				var q = new esri.tasks.Query(),
+				var q = new Query(),
 					spatialRef = this._gisMap.spatialReference,
-					multiPoint = new esri.geometry.Multipoint(),
+					multiPoint = new Multipoint(),
 					centerLocation,
 					centerX,
 					centerY;
@@ -1289,7 +1130,7 @@ require(dojoConfig, [], function() {
 						"/MapServer/" +
 						layerObj.visibleLayerIds;
 				}
-				var qt = new esri.tasks.QueryTask(identifyTaskLayerURL);
+				var qt = new QueryTask(identifyTaskLayerURL);
 
 				qt.execute(
 					q,
@@ -1304,9 +1145,7 @@ require(dojoConfig, [], function() {
 									centerX = centerLocation.x.toFixed(5).toString();
 									centerY = centerLocation.y.toFixed(5).toString();
 
-									multiPoint.addPoint(
-										new esri.geometry.Point(centerX, centerY)
-									);
+									multiPoint.addPoint(new Point(centerX, centerY));
 								} else {
 									console.log(this._logNode + "query gave empty result");
 								}
@@ -1368,12 +1207,12 @@ require(dojoConfig, [], function() {
 					console.log(this._logNode + "._setupEvents");
 				}
 				// make editing possible
-				this._editToolbar = new esri.toolbars.Edit(this._gisMap);
+				this._editToolbar = new Edit(this._gisMap);
 
 				// make moving of infowindow possible
 				var handle = this._gisMap.infoWindow.domNode.querySelector(".title");
 
-				var dnd = new dojo.dnd.Moveable(this._gisMap.infoWindow.domNode, {
+				/*var dnd = new Moveable(this._gisMap.infoWindow, {
 					handle: handle
 				});
 
@@ -1394,34 +1233,18 @@ require(dojoConfig, [], function() {
 							arrowNode.classList.add("hidden");
 						})
 						.bind(this)
-				);
+				);*/
 
 				// set default placeholder text. Somehow this is not working when setting property before startup.
-				const searchIpt = dojo.query(".searchInputGroup input");
-				if(searchIpt && searchIpt[0]){
+				const searchIpt = domQuery(".searchInputGroup input");
+				if (searchIpt && searchIpt[0]) {
 					searchIpt[0].placeholder = "Zoek adres of plaats";
 				}
 			},
 			_layerAddResultsEventHandler: function(layers) {
-				// set extent if a queryDefinition is given and a layer to be queried on is known
-				if (this._queryLayerObj && this._queryDefinition) {
-					this._getExtentFromQueryDef(
-						this._queryLayerObj,
-						this._queryDefinition
-					);
-				} else if (this.objectid) {
-					this.zoomRow(
-						this.objectid,
-						this.centerCoordinates,
-						this.geometryType
-					);
-				} else {
-					this.zoomRow();
-				}
-
 				if (this.enableLegend) {
 					// add the legend
-					var legend = new esri.dijit.Legend(
+					var legend = new Legend(
 						{
 							map: this._gisMap,
 							layerInfos: this.legendLayers
@@ -1461,7 +1284,7 @@ require(dojoConfig, [], function() {
 
 						var layerName = layer.title;
 
-						var span = dom.create("span", {
+						var span = mxDom.create("span", {
 							id: "spanLabel_" + m
 						});
 
@@ -1475,7 +1298,7 @@ require(dojoConfig, [], function() {
 						// actually style the carets
 						this._setCaretCSS(span);
 
-						var checkLabel = dom.create(
+						var checkLabel = mxDom.create(
 							"label",
 							{
 								for: "checkBox" + layer.layer.id,
@@ -1488,14 +1311,14 @@ require(dojoConfig, [], function() {
 							span
 						);
 
-						var checkBox = dom.create("input", {
+						var checkBox = mxDom.create("input", {
 							name: "checkBox" + layer.layer.id,
 							value: layer.layer.id,
 							checked: layer.startLayerTicked,
 							type: "checkbox"
 						});
 
-						var ul = dom.create(
+						var ul = mxDom.create(
 							"ul",
 							{
 								style: {
@@ -1510,10 +1333,10 @@ require(dojoConfig, [], function() {
 						);
 
 						//add the check box after the label in the toc
-						dojo.place(checkLabel, checkBox, "after");
+						domConstruct.place(checkLabel, checkBox, "after");
 
 						//add the check label to the table of contents
-						dojo.place(ul, this.toggleDiv, "after");
+						domConstruct.place(ul, this.toggleDiv, "after");
 
 						on(
 							checkBox,
@@ -1547,7 +1370,7 @@ require(dojoConfig, [], function() {
 							var subLayerName = subLayerArray[n].name;
 							var subLayerID = subLayerArray[n].id;
 
-							var checkLabel_Sub = dom.create(
+							var checkLabel_Sub = mxDom.create(
 								"label",
 								{
 									for: "checkBox" + subLayerID,
@@ -1559,7 +1382,7 @@ require(dojoConfig, [], function() {
 								"  " + subLayerName
 							);
 
-							var checkBox_Sub = dom.create("input", {
+							var checkBox_Sub = mxDom.create("input", {
 								name: "checkBox" + subLayerID,
 								value: layer.layer.id + "-" + subLayerID,
 								checked: subLayerArray[n].defaultVisibility,
@@ -1567,10 +1390,10 @@ require(dojoConfig, [], function() {
 								style: "margin-left:10px"
 							});
 
-							var li = dom.create("li", {}, checkBox_Sub, checkLabel_Sub);
+							var li = mxDom.create("li", {}, checkBox_Sub, checkLabel_Sub);
 
 							//add the check box after the label in the toc
-							dojo.place(li, checkLabel, "after");
+							domConstruct.place(li, checkLabel, "after");
 
 							on(
 								checkBox_Sub,
@@ -1616,70 +1439,7 @@ require(dojoConfig, [], function() {
 					}
 				}
 			},
-			zoomRow: function(id, centerCoordinates, geometryType) {
-				if (this.consoleLogging) {
-					console.log(this.id + ".zoomRow");
-					console.log(this._logNode + id);
-					console.log(this._logNode + centerCoordinates);
-					console.log(this._logNode + geometryType);
-				}
-
-				if (id) {
-					const spatialRef = this._gisMap.spatialReference;
-
-					if (centerCoordinates) {
-						const centerArray = centerCoordinates.split(",");
-						const centerX = Number(centerArray[0]);
-						const centerY = Number(centerArray[1]);
-						const centerLocation = new esri.geometry.Point(
-							centerX,
-							centerY,
-							spatialRef
-						);
-
-						this._gisMap.centerAndZoom(
-							centerLocation,
-							Number(this._singleObjectZoom) - 1
-						);
-					} else {
-						let q = new esri.tasks.Query();
-						q.outSpatialReference = spatialRef;
-						q.returnGeometry = true;
-						q.outFields = this.queryOutFieldsArr;
-
-						// add where statement based on unique identifier name from MendixObj
-						q.where = this.arcGISID + "=" + id;
-
-						// get correct layer from layercache based on geometryType.
-						const layerObj = this.layerArr.filter(
-							lang.hitch(this, function(layer) {
-								return layer.geometryType == geometryType;
-							})
-						)[0];
-
-						if (layerObj) {
-							this._queryLayer(q, layerObj);
-						} else {
-							console.error(
-								this._logNode +
-									"For zooming a layerObj is needed. This was not found. Do all Layers have the correct geometryType defined in the Modeler?"
-							);
-						}
-					}
-				}
-				// no actual objectid is given for zooming
-				else {
-					// zoom to defaultposition with default zoom level
-					this._gisMap.centerAndZoom(
-						this._defaultPosition,
-						Number(this.defaultZoom) - 1
-					);
-				}
-			},
 			containsObject: function(obj, list) {
-				if (this.consoleLogging) {
-					console.log(this.id + ".zoomRow");
-				}
 				var i;
 				for (i = 0; i < list.length; i++) {
 					if (list[i] == obj) {
@@ -1932,7 +1692,7 @@ require(dojoConfig, [], function() {
 					console.log(this.id + "._createTemplate");
 				}
 				// create general panes and containers
-				var contentPane = new dijit.layout.BorderContainer({
+				var contentPane = BorderContainer({
 					className: "content",
 					gutters: false,
 					design: "headline",
@@ -1950,7 +1710,7 @@ require(dojoConfig, [], function() {
 					width: "100%"
 				});
 
-				var mapContainer = new dijit.layout.ContentPane({
+				var mapContainer = new ContentPane({
 					className: "mapDiv",
 					region: "center"
 				});
@@ -1981,13 +1741,13 @@ require(dojoConfig, [], function() {
 				// only create rightPane if either legend, togglelayer or draw is enabled
 				if (this.enableToggleLayers | this.enableLegend) {
 					// generic accordion container
-					var accordionContainer = new dijit.layout.ContentPane({
+					var accordionContainer = ContentPane({
 						className: "rightPane",
 						region: "right",
 						height: "100%"
 					});
 
-					var accordion = new dijit.layout.AccordionContainer();
+					var accordion = new AccordionContainer();
 
 					this.accordionContainer = accordionContainer.domNode;
 
@@ -2005,7 +1765,7 @@ require(dojoConfig, [], function() {
 					contentPane.addChild(accordionContainer);
 
 					if (this.enableLegend) {
-						var legendPane = new dijit.layout.ContentPane({
+						var legendPane = new ContentPane({
 							className: "legendPane",
 							title: "Legenda"
 						});
@@ -2021,7 +1781,7 @@ require(dojoConfig, [], function() {
 						this.legendPane = legendPane.domNode;
 					}
 					if (this.enableToggleLayers) {
-						var toggleLayerPane = new dijit.layout.ContentPane({
+						var toggleLayerPane = new ContentPane({
 							className: "toggleLayerPane",
 							title: "Lagen",
 							style: "overflow-y: auto;"
@@ -2063,7 +1823,7 @@ require(dojoConfig, [], function() {
 				if (this.consoleLogging) {
 					console.log(this.id + "._createButton");
 				}
-				var button = new dijit.form.Button({
+				var button = new Button({
 					className: className,
 					iconClass: iconClass,
 					innerHTML: text,
@@ -2128,30 +1888,22 @@ require(dojoConfig, [], function() {
 				if (geometry.type == "polyline" || geometry.type == "polygon") {
 					var extent = "";
 					if (geometry.rings) {
-						extent = new esri.geometry.Polyline(geometry.rings).getExtent();
+						extent = new Polyline(geometry.rings).getExtent();
 					} else if (geometry.paths) {
-						extent = new esri.geometry.Polyline(geometry.paths).getExtent();
+						extent = new Polyline(geometry.paths).getExtent();
 					}
 
 					centerX = (extent.xmax + extent.xmin) / 2;
 					centerY = (extent.ymax + extent.ymin) / 2;
 					centerSpatRef = geometry.spatialReference;
 
-					centerLocation = new esri.geometry.Point(
-						centerX,
-						centerY,
-						centerSpatRef
-					);
+					centerLocation = new Point(centerX, centerY, centerSpatRef);
 				} else if (geometry.type == "point") {
 					centerX = geometry.x;
 					centerY = geometry.y;
 					centerSpatRef = geometry.spatialReference;
 
-					centerLocation = new esri.geometry.Point(
-						centerX,
-						centerY,
-						centerSpatRef
-					);
+					centerLocation = new Point(centerX, centerY, centerSpatRef);
 				}
 				return centerLocation;
 			},
@@ -2217,7 +1969,7 @@ require(dojoConfig, [], function() {
 					function(resolve) {
 						this.geometryService.project(
 							points,
-							new esri.SpatialReference({
+							new SpatialReference({
 								wkid: Number(this.spatialReference)
 							}),
 							function(projectedPoints) {
@@ -2237,25 +1989,25 @@ require(dojoConfig, [], function() {
 				) {
 					const { longitude, latitude } = await this._getGPSLocation();
 					const projectedPoints = await this._projectPoint([
-						new esri.geometry.Point(longitude, latitude)
+						new Point(longitude, latitude)
 					]);
 
 					location = projectedPoints[0];
 				} else {
-					location = new esri.geometry.Point(
-						Number(this.DefaultX),
+					location = new Point(
+						Number(this.defaultX),
 						Number(this.defaultY),
-						new esri.SpatialReference({ wkid: Number(this.spatialReference) })
+						new SpatialReference({ wkid: Number(this.spatialReference) })
 					);
 				}
 
-				const symbol = new esri.symbol.SimpleMarkerSymbol({
-					color: new esri.Color(this.currentLocationColor),
+				const symbol = new SimpleMarkerSymbol({
+					color: new Color(this.currentLocationColor),
 					size: 15,
 					type: "esriSMS",
 					style: "esriSMSCircle"
 				});
-				const graphic = new esri.Graphic(location, symbol);
+				const graphic = new Graphic(location, symbol);
 				const layer = this._createNewDeclarationLayer();
 				layer.add(graphic);
 
@@ -2264,7 +2016,7 @@ require(dojoConfig, [], function() {
 				this._updateNewDeclarationLocation(location.x, location.y);
 			},
 			_createNewDeclarationLayer: function() {
-				const layer = new esri.layers.GraphicsLayer({
+				const layer = new GraphicsLayer({
 					id: "newDeclarationLyr"
 				});
 				//click handlers
@@ -2276,7 +2028,7 @@ require(dojoConfig, [], function() {
 						this.editNewDeclarationLyrActive = !this
 							.editNewDeclarationLyrActive;
 						if (this.editNewDeclarationLyrActive) {
-							this._editToolbar.activate(esri.toolbars.Edit.MOVE, evt.graphic);
+							this._editToolbar.activate(Edit.MOVE, evt.graphic);
 							this._editToolbar.on(
 								"graphic-move-stop",
 								function(e) {
@@ -2296,7 +2048,7 @@ require(dojoConfig, [], function() {
 				return layer;
 			},
 			_createExistingDeclarationsLayer: async function(declarationArr) {
-				let layer = new esri.layers.GraphicsLayer({
+				let layer = new GraphicsLayer({
 					id: "existingDeclarationsLyr"
 				});
 
@@ -2324,24 +2076,24 @@ require(dojoConfig, [], function() {
 			},
 			_addExistingDeclarationToLayer(declaration, layer) {
 				const attributes = declaration.jsonData.attributes;
-				const location = new esri.geometry.Point({
+				const location = new Point({
 					x: attributes[this.DeclarationLongitude].value,
 					y: attributes[this.DeclarationLatitude].value,
-					spatialReference: new esri.SpatialReference({
+					spatialReference: new SpatialReference({
 						wkid: Number(this.spatialReference)
 					})
 				});
 				const color = this._getDeclarationColorForStatus(
 					attributes[this.reportStatus].value
 				);
-				const symbol = new esri.symbol.SimpleMarkerSymbol({
-					color: new esri.Color(color),
+				const symbol = new SimpleMarkerSymbol({
+					color: new Color(color),
 					size: 15,
 					type: "esriSMS",
 					style: "esriSMSDiamond"
 				});
 
-				layer.add(esri.Graphic(location, symbol, attributes));
+				layer.add(new Graphic(location, symbol, attributes));
 			},
 			_getDeclarationColorForStatus(status) {
 				const fallbackColor = "#1e6b00";
@@ -2446,10 +2198,10 @@ require(dojoConfig, [], function() {
 				const points = declarationMFResult.map(declaration => {
 					const attributes = declaration.jsonData.attributes;
 
-					return new esri.geometry.Point({
+					return new Point({
 						x: attributes[this.DeclarationLongitude].value,
 						y: attributes[this.DeclarationLatitude].value,
-						spatialReference: new esri.SpatialReference({
+						spatialReference: new SpatialReference({
 							wkid: Number(this.spatialReference)
 						})
 					});
