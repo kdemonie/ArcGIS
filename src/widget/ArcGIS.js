@@ -263,6 +263,14 @@ return skipCheckDefine("ArcGIS/widget/ArcGIS", [
 				this.centerCoordinates = this._contextObj
 					? this._contextObj.get(this.centerAttr)
 					: null;
+
+				this.contextReportLongitude = this._contextObj
+					? this._contextObj.get(this.DeclarationLongitude)
+					: null;
+				this.contextReportLatitude = this._contextObj
+					? this._contextObj.get(this.DeclarationLatitude)
+					: null;
+
 				this.geometryType = this._contextObj
 					? this._contextObj.get(this.geometryTypeAttr)
 					: null;
@@ -518,6 +526,13 @@ return skipCheckDefine("ArcGIS/widget/ArcGIS", [
 						Number(gpsLocation.longitude),
 						Number(gpsLocation.latitude),
 						zoomLevel
+					);
+				} else if(this.contextReportLatitude && this.contextReportLongitude){
+					this._zoomToLocation(
+						Number(this.contextReportLongitude),
+						Number(this.contextReportLatitude),
+						zoomLevel,
+						false
 					);
 				} else {
 					this._zoomToLocation(
