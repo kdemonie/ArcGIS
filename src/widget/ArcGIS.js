@@ -269,12 +269,7 @@ return skipCheckDefine("ArcGIS/widget/ArcGIS", [
 
 				// if no map available, so at initial load after postCreate, load map in callback of getHostName
 				if (!this._gisMap) {
-					this._getHostNameMF(callback);
-					if (this.customZoomlevel) {
-						this._getCustomZoomLevelMF();
-					} else {
-						this.zoomlevel = this.defaultZoom;
-					}
+					this._getHostNameMF(callback);					
 				} else {
 					this._referenceMxObjectsArr = [obj];
 					this._refreshMap();
@@ -320,6 +315,9 @@ return skipCheckDefine("ArcGIS/widget/ArcGIS", [
 				const gpsLocation = this.centerOnLocation
 					? await this._getGPSLocation()
 					: undefined;
+				const zoomLevel = this.customZoomlevel 
+					? await this._getCustomZoomLevelMF() 
+					: this.defaultZoom;
 
 				//This specifies the symbols highlighting selected/queried objects
 				var popup = new Popup(
@@ -475,7 +473,7 @@ return skipCheckDefine("ArcGIS/widget/ArcGIS", [
 				}
 				this._gisMap = new Map(this.mapContainer, {
 					basemap: "topo",
-					zoom: Number(this.zoomlevel),
+					zoom: Number(zoomLevel),
 					sliderStyle: "small",
 					infoWindow: popup
 					//,extent : ext
@@ -519,13 +517,13 @@ return skipCheckDefine("ArcGIS/widget/ArcGIS", [
 					this._zoomToLocation(
 						Number(gpsLocation.longitude),
 						Number(gpsLocation.latitude),
-						this.zoomlevel
+						zoomLevel
 					);
 				} else {
 					this._zoomToLocation(
 						Number(this.defaultX),
 						Number(this.defaultY),
-						this.zoomlevel,
+						zoomLevel,
 						false
 					);
 				}
@@ -1016,20 +1014,23 @@ return skipCheckDefine("ArcGIS/widget/ArcGIS", [
 				}
 			},
 			_getCustomZoomLevelMF: function() {
-				mx.data.action({
-					params: {
-						applyto: "none",
-						actionname: this.customZoomlevel
-					},
-					origin: this.mxform,
-					callback: lang.hitch(this, function(intResult) {
-						this.zoomlevel = intResult;
-					}),
-					error: lang.hitch(this, function(error) {
-						console.error(this._logNode + error.description);
-						this.zoomlevel = this.defaultZoom;
-					})
+				return new Promise((resolve) => {
+					mx.data.action({
+						params: {
+							applyto: "none",
+							actionname: this.customZoomlevel
+						},
+						origin: this.mxform,
+						callback: lang.hitch(this, function(zoomlevel) {
+							resolve(zoomlevel);
+						}),
+						error: lang.hitch(this, function(error) {
+							console.error(this._logNode + error.description);
+							resolve(this.defaultZoom);
+						})
+					});
 				});
+				
 			},
 			_queryLayer: function(query, layerObj) {
 				if (this.consoleLogging) {
@@ -2177,13 +2178,15 @@ return skipCheckDefine("ArcGIS/widget/ArcGIS", [
 								console.dir(this._logNode + objs);
 							}
 
-							if (this.zoomToFit) {
+							if (objs && this.zoomToFit) {
 								this._zoomToFitDeclarations(objs);
 							} else {
 								this.declarationsGeometry = undefined;
 							}
-
-							this._createExistingDeclarationsLayer(objs);
+							
+							if (objs ) {
+								this._createExistingDeclarationsLayer(objs);
+							}
 						}),
 						error: lang.hitch(this, function(error) {
 							console.error(this._logNode + error.description);
