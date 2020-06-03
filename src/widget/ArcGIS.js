@@ -260,15 +260,11 @@ return skipCheckDefine("ArcGIS/widget/ArcGIS", [
 				this._resetSubscriptions();
 
 				// Widget configured variables
-				this.centerCoordinates = this._contextObj
-					? this._contextObj.get(this.centerAttr)
-					: null;
-
 				this.contextReportLongitude = this._contextObj
-					? this._contextObj.get(this.DeclarationLongitude)
+					? this._contextObj.get(this.DeclarationLongitudeAttr)
 					: null;
 				this.contextReportLatitude = this._contextObj
-					? this._contextObj.get(this.DeclarationLatitude)
+					? this._contextObj.get(this.DeclarationLatitudeAttr)
 					: null;
 
 				this.geometryType = this._contextObj
@@ -319,11 +315,8 @@ return skipCheckDefine("ArcGIS/widget/ArcGIS", [
 				if (this.consoleLogging) {
 					console.log(this._logNode + "._loadMap");
 				}
-
-				const gpsLocation = this.centerOnLocation
-					? await this._getGPSLocation()
-					: undefined;
-				const zoomLevel = this.customZoomlevel 
+				
+				this.zoomLevel = this.customZoomlevel 
 					? await this._getCustomZoomLevelMF() 
 					: this.defaultZoom;
 
@@ -481,7 +474,7 @@ return skipCheckDefine("ArcGIS/widget/ArcGIS", [
 				}
 				this._gisMap = new Map(this.mapContainer, {
 					basemap: "topo",
-					zoom: Number(zoomLevel),
+					zoom: Number(this.zoomLevel),
 					sliderStyle: "small",
 					infoWindow: popup
 					//,extent : ext
@@ -516,32 +509,13 @@ return skipCheckDefine("ArcGIS/widget/ArcGIS", [
 						// attach events to gismap and layer loading
 						this._setupEvents();
 
-						if( this.enableNewReportCreation ) { this._initNewDeclaration(); }
+						if( this.reportInteraction !== "NONE" ) { this._initNewDeclaration(); }
 						this._getDeclarationsData();
 					}.bind(this)
 				);
 
-				if (gpsLocation && gpsLocation !== -1 && this.centerOnLocation) {
-					this._zoomToLocation(
-						Number(gpsLocation.longitude),
-						Number(gpsLocation.latitude),
-						zoomLevel
-					);
-				} else if(this.contextReportLatitude && this.contextReportLongitude){
-					this._zoomToLocation(
-						Number(this.contextReportLongitude),
-						Number(this.contextReportLatitude),
-						zoomLevel,
-						false
-					);
-				} else {
-					this._zoomToLocation(
-						Number(this.defaultX),
-						Number(this.defaultY),
-						zoomLevel,
-						false
-					);
-				}
+
+				await this._centerMap(this.mapCenter);
 
 				var toggle = new BasemapToggle(
 					{
@@ -734,6 +708,43 @@ return skipCheckDefine("ArcGIS/widget/ArcGIS", [
 				}
 
 				this._gisMap.addLayers(this.arcGisLayerArr);
+			},
+			_centerMap: async function(type){
+				
+
+				switch(type){
+					case "CONTEXT" : 
+						if(this.contextReportLatitude && this.contextReportLongitude){
+							this._zoomToLocation(
+								Number(this.contextReportLongitude),
+								Number(this.contextReportLatitude),
+								this.zoomLevel,
+								false
+							);
+						} else { await this._centerMap("DEFAULT"); }
+						break;
+					case "REPORTSMF" : 
+						/* Centering of the map based on the result of reports from the getReportsMF happends in '_getDeclarationsData' */
+						break;
+					case "GPS":
+						const gpsLocation = await this._getGPSLocation();
+
+						if (gpsLocation && gpsLocation !== -1) {
+							this._zoomToLocation(
+								Number(gpsLocation.longitude),
+								Number(gpsLocation.latitude),
+								this.zoomLevel
+							);
+						} else { await this._centerMap("DEFAULT"); }
+						break;
+					default : 
+						this._zoomToLocation(
+							Number(this.defaultLongitude),
+							Number(this.defaultLatitude),
+							this.zoomLevel,
+							false
+						);
+				}
 			},
 			_zoomToLocation: function(longitude, latitude, zoom, project = true) {
 				if ( 
@@ -1046,71 +1057,6 @@ return skipCheckDefine("ArcGIS/widget/ArcGIS", [
 					});
 				});
 				
-			},
-			_queryLayer: function(query, layerObj) {
-				if (this.consoleLogging) {
-					console.log(this.id + "._queryLayer");
-				}
-				var identifyTaskLayerURL = "";
-
-				if (layerObj.serverType === "FeatureServer") {
-					identifyTaskLayerURL =
-						this.hostName +
-						this.midFix +
-						layerObj.url +
-						"/FeatureServer/" +
-						layerObj.featureLayerID;
-				} else if (layerObj.serverType === "MapServer") {
-					identifyTaskLayerURL =
-						this.hostName +
-						this.midFix +
-						layerObj.url +
-						"/MapServer/" +
-						layerObj.visibleLayerIds;
-				}
-				var qt = new QueryTask(identifyTaskLayerURL);
-
-				qt.execute(
-					query,
-					lang.hitch(this, function(response) {
-						if (response && response.features && response.features[0]) {
-							// extract needed content from QueryTask result
-							var geometry = response.features[0].geometry;
-
-							if (geometry) {
-								var centerLocation = this._getCenterCoordinates(geometry);
-
-								var centerX = centerLocation.x.toFixed(5).toString();
-								var centerY = centerLocation.y.toFixed(5).toString();
-
-								// store center coordinates for future reference, to minimize the API calls to ArcGIS
-								if (
-									this._contextObj &&
-									!this._contextObj.get(this.centerAttr)
-								) {
-									this._contextObj.set(
-										this.centerAttr,
-										centerX + "," + centerY
-									);
-									mx.data.commit({
-										mxobj: this._contextObj,
-										callback: lang.hitch(this, function() {}),
-										error: function(e) {
-											console.error("Could not commit object:", e);
-										}
-									});
-								}
-							} else {
-								console.log(this._logNode + "query gave empty result");
-							}
-						}
-						this._gisMap
-							.centerAndZoom(centerLocation, this._singleObjectZoom)
-							.then(lang.hitch(this, function() {}));
-					})
-				);
-
-				//return centerLocation;
 			},
 			_getExtentFromQueryDef: function(layerObj, queryDef) {
 				var q = new Query(),
@@ -1859,17 +1805,12 @@ return skipCheckDefine("ArcGIS/widget/ArcGIS", [
 					queryDefinition = this.arcGISID + " IN (";
 					// add each ID of the specific ArcGIS object to the IN statement
 					var ArcGISID = null;
-					var coordinates = null;
 					var firstIteration = true;
-					var centerArray = [];
-					var centerX = null;
-					var centerY = null;
 
 					this._objectsWithoutCoordinates = [];
 
 					for (var q = 0; q < this._referenceMxObjectsArr.length; q++) {
 						ArcGISID = this._referenceMxObjectsArr[q].get(this.objectIDAttr);
-						coordinates = this._referenceMxObjectsArr[q].get(this.centerAttr);
 
 						if (ArcGISID) {
 							// only first time no postfix , should be added
@@ -1995,39 +1936,57 @@ return skipCheckDefine("ArcGIS/widget/ArcGIS", [
 			},
 
 			_initNewDeclaration: async function() {
-				let location = undefined;
-				if (
-					this.centerOnLocation &&
-					(await this._getGPSLocation()) &&
-					(await this._getGPSLocation()) !== -1
-				) {
-					const { longitude, latitude } = await this._getGPSLocation();
-					const projectedPoints = await this._projectPoint([
-						new Point(longitude, latitude)
-					]);
-
-					location = projectedPoints[0];
-				} else {
-					location = new Point(
-						Number(this.defaultX),
-						Number(this.defaultY),
-						new SpatialReference({ wkid: Number(this.spatialReference) })
-					);
-				}
-
+				let declarationPt = await this._createInteractableReportPt();
 				const symbol = new SimpleMarkerSymbol({
-					color: new Color(this.currentLocationColor),
+					color: new Color(this.interactableReportColor),
 					size: 15,
 					type: "esriSMS",
 					style: "esriSMSCircle"
 				});
-				const graphic = new Graphic(location, symbol);
+				const graphic = new Graphic(declarationPt, symbol);
 				const layer = this._createNewDeclarationLayer();
 				layer.add(graphic);
 
 				this._gisMap.addLayers([layer]);
 
-				this._updateNewDeclarationLocation(location.x, location.y);
+				this._updateNewDeclarationLocation(declarationPt.x, declarationPt.y);
+			},
+			_createInteractableReportPt : async function(){
+				let point = undefined;
+
+				switch(this.reportInteraction){
+					case 'NEW_DEFAULT' : 
+						point = new Point(
+							Number(this.defaultLongitude),
+							Number(this.defaultLatitude),
+							new SpatialReference({ wkid: Number(this.spatialReference) })
+						);
+						break;
+					case 'NEW_GPS' :
+						const gpsLocation = await this._getGPSLocation();
+						if (gpsLocation && gpsLocation !== -1) {
+							const { longitude, latitude } = gpsLocation;
+							const projectedPoints = await this._projectPoint([new Point(longitude, latitude)]);
+		
+							point = projectedPoints[0];
+						} else {
+							point = new Point(
+								Number(this.defaultLongitude),
+								Number(this.defaultLatitude),
+								new SpatialReference({ wkid: Number(this.spatialReference) })
+							);
+						}
+						break;
+					case 'EDIT' : 
+						point = new Point(
+							Number(this.contextReportLongitude),
+							Number(this.contextReportLatitude),
+							new SpatialReference({ wkid: Number(this.spatialReference) })
+						);
+						break;
+				}
+
+				return point;
 			},
 			_createNewDeclarationLayer: function() {
 				const layer = new GraphicsLayer({
@@ -2091,14 +2050,14 @@ return skipCheckDefine("ArcGIS/widget/ArcGIS", [
 			_addExistingDeclarationToLayer(declaration, layer) {
 				const attributes = declaration.jsonData.attributes;
 				const location = new Point({
-					x: attributes[this.DeclarationLongitude].value,
-					y: attributes[this.DeclarationLatitude].value,
+					x: attributes[this.DeclarationLongitudeAttr].value,
+					y: attributes[this.DeclarationLatitudeAttr].value,
 					spatialReference: new SpatialReference({
 						wkid: Number(this.spatialReference)
 					})
 				});
 				const color = this._getDeclarationColorForStatus(
-					attributes[this.reportStatus].value
+					attributes[this.reportStatusAttr].value
 				);
 				const symbol = new SimpleMarkerSymbol({
 					color: new Color(color),
@@ -2141,14 +2100,14 @@ return skipCheckDefine("ArcGIS/widget/ArcGIS", [
 					);
 				}
 			},
-			_execNewReportChangekMf: function() {
+			_execReportChangeMf: function() {
 				const guid = this._contextObj.getGuid();
 				if (guid) {
 					mx.data.action(
 						{
 							params: {
 								applyto: "selection",
-								actionname: this.onNewReportChangeMF,
+								actionname: this.onReportChangeMF,
 								guids: [guid]
 							},
 							origin: this.mxform,
@@ -2162,18 +2121,18 @@ return skipCheckDefine("ArcGIS/widget/ArcGIS", [
 			},
 			_updateNewDeclarationLocation(longitude, latitude) {
 				if (longitude && latitude) {
-					this.DeclarationLongitude &&
+					this.DeclarationLongitudeAttr &&
 						this._contextObj.set(
-							this.DeclarationLongitude,
+							this.DeclarationLongitudeAttr,
 							Number(longitude).toFixed(8)
 						);
-					this.DeclarationLatitude &&
+					this.DeclarationLatitudeAttr &&
 						this._contextObj.set(
-							this.DeclarationLatitude,
+							this.DeclarationLatitudeAttr,
 							Number(latitude).toFixed(8)
 						);
 				}
-			    this.onNewReportChangeMF && this._execNewReportChangekMf();
+			    this.onReportChangeMF && this._execReportChangeMf();
 			},
 			_getDeclarationsData: function() {
 				if (this.getReportsMF) {
@@ -2193,10 +2152,11 @@ return skipCheckDefine("ArcGIS/widget/ArcGIS", [
 								console.dir(this._logNode + objs);
 							}
 
-							if (objs && this.zoomToFit) {
+							if (objs && this.mapCenter === "REPORTSMF") {
 								this._zoomToFitDeclarations(objs);
 							} else {
 								this.declarationsGeometry = undefined;
+								this._centerMap("DEFAULT");
 							}
 							
 							if (objs ) {
@@ -2215,8 +2175,8 @@ return skipCheckDefine("ArcGIS/widget/ArcGIS", [
 					const attributes = declaration.jsonData.attributes;
 
 					return new Point({
-						x: attributes[this.DeclarationLongitude].value,
-						y: attributes[this.DeclarationLatitude].value,
+						x: attributes[this.DeclarationLongitudeAttr].value,
+						y: attributes[this.DeclarationLatitudeAttr].value,
 						spatialReference: new SpatialReference({
 							wkid: Number(this.spatialReference)
 						})
